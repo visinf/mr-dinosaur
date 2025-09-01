@@ -1,0 +1,66 @@
+# @package _global_
+# ViT feature reconstruction on MOVI-E.
+defaults:
+  - /experiment/projects/mr_dinosaur/dinosaur_dinov2_movi_e/_base_feature_recon_lr0.0004
+  - /dataset: movi_e_image
+  - /experiment/projects/mr_dinosaur/dinosaur_dinov2_movi_e/_preprocessing_movi_dino_feature_recon
+  - /experiment/projects/mr_dinosaur/dinosaur_dinov2_movi_e/_metrics_clevr_patch
+  - _self_
+
+trainer:
+  devices: 1
+  max_steps: 500000
+  logger: tensorboard
+  check_val_every_n_epoch: 50
+  callbacks: 
+    - ${experiment.callbacks.model_checkpoint}  
+  enable_checkpointing: true  
+  num_sanity_val_steps: 0
+
+dataset:
+  num_workers: 4
+  batch_size: 64
+
+
+experiment:
+  input_feature_dim: 768
+  callbacks:
+    model_checkpoint:
+      _target_: pytorch_lightning.callbacks.ModelCheckpoint
+      dirpath: checkpoints 
+      filename: "model-{epoch:03d}-{step:06d}" 
+      save_top_k: -1  
+      every_n_epochs: 5  
+      save_on_train_epoch_end: true  
+training_vis_frequency: 1000
+
+
+models:
+  conditioning:
+    _target_: routed.ocl.conditioning.RandomConditioning
+    n_slots: 24
+    object_dim: 128
+
+    batch_size_path: input.batch_size
+  feature_extractor:
+    _target_: routed.ocl.feature_extractors.DINOv2FeatureExtractor
+    freeze: true
+    feature_level: [11]
+    video_path: input.image
+  object_decoder:
+    _target_: routed.ocl.decoding.PatchDecoder
+    num_patches: 361
+    decoder:
+      _target_: ocl.neural_networks.build_mlp
+      _partial_: true
+      features: [1024, 1024, 1024]
+    object_features_path: perceptual_grouping.objects
+
+  masks_as_image:
+    _target_: routed.ocl.utils.resizing.Resize
+    input_path: object_decoder.masks
+    size: 128
+    resize_mode: bilinear
+    patch_mode: true
+load_checkpoint: /visinf/projects_students/vimb09/oclf/projects/mr_dinosaur/dinosaur_dinov2_movi_e/movi_e_feat_rec.yaml/2025-05-14_00-49-33/checkpoints/model-epoch114-step157438.ckpt
+# load_checkpoint: /visinf/projects_students/vimb09/oclf/projects/mr_dinosaur/dinosaur_dinov2_movi_e/movi_e_feat_rec.yaml/2025-05-10_10-54-57/checkpoints/model-epoch119-step164282.ckpt

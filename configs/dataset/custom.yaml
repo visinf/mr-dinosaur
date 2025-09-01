@@ -1,0 +1,5 @@
+_target_: ocl.datasets.WebdatasetDataModule
+test_shards: "${oc.env:DATASET_PREFIX}/custom/test/shard-{000000..000000}.tar"
+test_size: 1000 # frame_num * windows_num, e.g 5 frames * 4 windows = 20
+use_autopadding: true
+num_workers: 1

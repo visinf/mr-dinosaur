@@ -1,0 +1,98 @@
+# @package _global_
+defaults:
+  - /evaluation_config
+  - /dataset: kitti
+  - _self_
+
+eval_batch_size: 4  # Needs to match number of windows
+train_config_overrides:
+  - "+visualizations.masks_visualization._target_=routed.ocl.visualizations.SegmentationOut"
+  - "+visualizations.masks_visualization.mask_path=masks_merged"
+  - "+visualizations.masks_visualization.image_path=input.image_resized_copy"
+  - "+visualizations.masks_visualization.windows=4"
+  - "+visualizations.masks_visualization.output_path=visualization"
+
+modules:
+  masks_resized:
+    _target_: routed.ocl.utils.resizing.Resize
+    input_path: object_decoder.masks
+    size: [378, 378]
+    patch_mode: true
+    channels_last: false
+  masks_joined:
+    _target_: routed.ocl.utils.windows.JoinWindows
+    n_windows: 4
+    masks_path: masks_resized
+    keys_path: input.__key__
+    size: [378, 1260]
+  masks_merged:
+    _target_: routed.ocl.utils.windows.MergeWindows
+    n_windows: 4
+    similarity: 0.2
+    masks_path: masks_joined
+    slot_features_path: object_decoder.slot_features
+    keys_path: input.__key__
+    size: [378, 378]
+
+skip_metrics: true  # Skip metrics, as they are not needed for inference
+save_outputs: false
+
+dataset:
+  eval_transforms:
+    # Resize images into one single shape before applying the sliding window
+    02a_pre_resize:
+      _target_: ocl.transforms.SimpleTransform
+      batch_transform: false
+      transforms:
+        image:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _target_: torchvision.transforms.ToTensor
+            - _target_: torchvision.transforms.Resize
+              _convert_: all
+              size: [378, 1260]
+              interpolation: "${torchvision_interpolation_mode:BICUBIC}"
+            - "${lambda_fn:'lambda image: image.clamp(0.0, 1.0)'}"  # Bicubic interpolation can get out of range
+            - "${lambda_fn:'lambda v: v.permute(1, 2, 0).numpy()'}"
+        instance_mask:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _target_: ocl.preprocessing.MaskToTensor
+            - _target_: ocl.preprocessing.ResizeNearestExact
+              size: [378, 1260]
+    02b_copy_resized:
+      _target_: ocl.transforms.DuplicateFields
+      mapping:
+        image: image_resized_copy     
+      batch_transform: false          
+    02c_hwc2chw:
+      _target_: ocl.transforms.SimpleTransform
+      batch_transform: false
+      transforms:
+        image_resized_copy:
+          _target_: torchvision.transforms.Lambda
+          lambd: "${lambda_fn:'lambda v: v.transpose(2, 0, 1)'}"
+    # Apply sliding window, yielding several windows of the original image
+    02d_sliding_window:
+      _target_: ocl.transforms.SpatialSlidingWindow
+      window_size: [378, 378]
+      stride: [378, 378]
+      padding: [126, 0, 126, 0]
+      expected_n_windows: 4
+      fields: ["image"]
+    03b_preprocessing:
+      _target_: ocl.transforms.SimpleTransform
+      batch_transform: false
+      transforms:
+        image:
+          # Preprocess each window for the network
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _target_: torchvision.transforms.ToTensor
+            - _target_: torchvision.transforms.Resize
+              size: 378
+              interpolation: "${torchvision_interpolation_mode:BICUBIC}"
+            - "${lambda_fn:'lambda image: image.clamp(0.0, 1.0)'}"  # Bicubic interpolation can get out of range
+            - _target_: torchvision.transforms.Normalize
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]

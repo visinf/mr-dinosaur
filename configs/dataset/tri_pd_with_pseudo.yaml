@@ -1,0 +1,6 @@
+_target_: ocl.datasets.WebdatasetDataModule
+train_shards: "${oc.env:DATASET_PREFIX}/pd/train_with_label/shard-{000000..000255}.tar"
+train_size: 20673
+val_shards: "${oc.env:DATASET_PREFIX}/pd/val/shard-{000000..000418}.tar"
+val_size: 20400 #10200*2
+use_autopadding: true

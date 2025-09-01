@@ -1,0 +1,6 @@
+_target_: ocl.datasets.WebdatasetDataModule
+train_shards: "${oc.env:DATASET_PREFIX}/kitti/train_with_label/shard-{000000..000082}.tar"
+train_size: 24299
+val_shards: "${oc.env:DATASET_PREFIX}/kitti/val/shard-{000000..000011}.tar"
+val_size: 800 #200*4
+use_autopadding: true

@@ -1,0 +1,65 @@
+# @package _global_
+defaults:
+  - /evaluation_config
+  - /dataset: custom
+  - _self_
+eval_test: true  # Evaluate on test set
+eval_val: false  # Do not evaluate on val set
+eval_batch_size: 1  # Needs to match number of windows
+train_config_overrides:
+  - "+visualizations.masks_visualization._target_=routed.ocl.visualizations.SegmentationOut"
+  - "+visualizations.masks_visualization.mask_path=masks_resized"
+  - "+visualizations.masks_visualization.image_path=input.image_resized_copy"
+  - "+visualizations.masks_visualization.windows=${eval_batch_size}"
+  - "+visualizations.masks_visualization.output_path=visualization"
+
+
+modules:
+  masks_resized:
+    _target_: routed.ocl.utils.resizing.Resize
+    input_path: object_decoder.masks
+    size: 
+      - 378  # image height H
+      - 378
+    patch_mode: true
+    channels_last: false
+
+
+skip_metrics: true  # Skip metrics, as they are not needed for inference
+save_outputs: false
+
+dataset:
+  eval_transforms:
+    # Resize images into one single shape before applying the sliding window
+    02a_pre_resize:
+      _target_: ocl.transforms.SimpleTransform
+      batch_transform: false
+      transforms:
+        image:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _target_: torchvision.transforms.ToTensor
+            - _target_: torchvision.transforms.Resize
+              _convert_: all
+              size: 378
+              interpolation: "${torchvision_interpolation_mode:BICUBIC}"
+            - "${lambda_fn:'lambda image: image.clamp(0.0, 1.0)'}" # Bicubic interpolation can get out of range
+            - _target_: torchvision.transforms.CenterCrop
+              size: 378
+    02b_copy_resized:
+      _target_: ocl.transforms.DuplicateFields
+      mapping:
+        image: image_resized_copy     
+      batch_transform: false        
+    02c_normalize:
+      _target_: ocl.transforms.SimpleTransform
+      batch_transform: false
+      transforms:
+        image:
+          _target_: torchvision.transforms.Compose
+          transforms:
+            - _target_: torchvision.transforms.Normalize
+              mean: [0.485, 0.456, 0.406]
+              std: [0.229, 0.224, 0.225]     
+
+

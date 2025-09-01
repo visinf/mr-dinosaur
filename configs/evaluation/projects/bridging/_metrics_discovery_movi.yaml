@@ -1,0 +1,51 @@
+# @package _global_
+# Metrics for MOVi datasets
+evaluation_metrics:
+  fg-ari:
+    _target_: routed.ocl.metrics.ARIMetric
+    prediction_path: masks_resized
+    target_path: input.mask
+    foreground: true
+  mbo:
+    _target_: routed.ocl.metrics.AverageBestOverlapMetric
+    prediction_path: masks_resized
+    target_path: input.mask
+    ignore_background: true
+
+  mIoU:
+    _target_: routed.ocl.metrics.UnsupervisedMaskIoUMetric
+    prediction_path: masks_resized
+    target_path: input.mask
+    ignore_background: true
+
+  all_ari:
+    _target_: routed.ocl.metrics.ARIMetric
+    prediction_path: masks_resized
+    target_path: input.mask
+    foreground: false
+    convert_target_one_hot: true
+    ignore_overlaps: true
+
+  F1@50:
+    _target_: routed.ocl.metrics.APandARMetric
+    prediction_path: masks_resized
+    target_path: input.mask
+    # foreground: true
+  AP@50:
+    _target_: routed.ocl.metrics.APandARMetric
+    prediction_path: masks_resized
+    target_path: input.mask
+    # foreground: true
+    ap: true
+  AR@50:
+    _target_: routed.ocl.metrics.APandARMetric
+    prediction_path: masks_resized
+    target_path: input.mask
+    # foreground: true
+    ar: true  
+  # average_recall_mask_50:
+  #   _target_: routed.ocl.metrics.APandARMetric
+  #   prediction_path: masks_resized
+  #   target_path: input.mask
+  #   foreground: true
+

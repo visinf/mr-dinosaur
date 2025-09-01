@@ -1,0 +1,15 @@
+# @package _global_
+evaluation_metrics:
+  instance_mask_ari:
+    _target_: routed.ocl.metrics.ARIMetric
+    prediction_path: object_decoder.masks_as_image
+    target_path: input.instance_mask
+    foreground: true
+    convert_target_one_hot: true
+    ignore_overlaps: true
+  instance_mask_mbo:
+    _target_: routed.ocl.metrics.AverageBestOverlapMetric
+    prediction_path: object_decoder.masks_as_image
+    target_path: input.instance_mask
+    ignore_background: true
+    ignore_overlaps: true

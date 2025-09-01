@@ -1,0 +1,73 @@
+# @package _global_
+defaults:
+  - /experiment/projects/mr_dinosaur/mr_dinosaur_dinov2_kitti/_base_feature_recon_mlp
+  - /dataset: kitti_with_pseudo
+  - /experiment/projects/mr_dinosaur/mr_dinosaur_dinov2_kitti/_preprocessing_kitti_dino_feature_recon_no_crop
+  - /experiment/projects/mr_dinosaur/mr_dinosaur_dinov2_kitti/_metrics_kitti
+  - _self_
+
+trainer:
+  devices: 1
+  max_steps: 2000
+  max_epochs: 1
+  logger: tensorboard
+  check_val_every_n_epoch: 1000
+  callbacks: 
+    - ${experiment.callbacks.model_checkpoint}
+  enable_checkpointing: true 
+  num_sanity_val_steps: 0
+training_vis_frequency: 100
+dataset:
+  num_workers: 4
+  batch_size: 8
+
+experiment:
+  input_feature_dim: 768
+  callbacks:
+    model_checkpoint:
+      _target_: pytorch_lightning.callbacks.ModelCheckpoint
+      dirpath: checkpoints 
+      filename: "model-{epoch:03d}-{step:06d}" 
+      save_top_k: -1  
+      every_n_train_steps: 100 
+      save_on_train_epoch_end: true
+
+models:
+  conditioning:
+    _target_: routed.ocl.conditioning.RandomConditioning
+    n_slots: 15
+    object_dim: 32
+    batch_size_path: input.batch_size
+  feature_extractor:
+    _target_: routed.ocl.feature_extractors.DINOv2FeatureExtractor
+    freeze: true
+    feature_level: [11]
+    video_path: input.image
+  object_decoder:
+    _target_: routed.ocl.decoding.PatchDecoderMLP
+    num_patches: 729
+    slot_decoder:
+      _target_: ocl.neural_networks.build_mlp
+      _partial_: true
+      features: [2048,2048,2048]
+    decoder:
+      _target_: ocl.neural_networks.build_mlp
+      _partial_: true
+      features: [2048, 2048, 2048]
+    object_features_path: perceptual_grouping.objects
+
+optimizers:
+  opt0:
+    _target_: ocl.optimization.OptimizationWrapper
+    optimizer:
+      _target_: torch.optim.Adam
+      _partial_: true
+      lr: 0.00004
+    lr_scheduler:
+      _target_: ocl.scheduling.exponential_decay_after_optional_warmup
+      _partial_: true
+      decay_rate: 1
+      decay_steps: 1
+      warmup_steps: 0
+seed: 0
+load_checkpoint: null

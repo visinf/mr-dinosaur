@@ -66,7 +66,7 @@ poetry install -E timm -E clip
 ```
 
 ### Dataset Organization
-To prepare a datasets, follow this pipeline: (1) download each datasets and reorganize it into the required directory structure. In our project, we've used [KITTI](https://www.cvlibs.net/datasets/kitti/raw_data.php), [TRI-PD](https://github.com/zpbao/Discovery_Obj_Move) and [MOVI-E](https://github.com/google-research/kubric/tree/main/challenges/movi); (2) generate pseudo-labels; and (3) convert the training set, validation set, and pseudo-label set into the WebDataset format. Following, we provide an example using the KITTI dataset.
+To prepare a dataset, follow this pipeline: (1) download each dataset and reorganize it into the required directory structure. In our project, we've used [KITTI](https://www.cvlibs.net/datasets/kitti/raw_data.php), [TRI-PD](https://github.com/zpbao/Discovery_Obj_Move) and [MOVI-E](https://github.com/google-research/kubric/tree/main/challenges/movi); (2) generate pseudo-labels; and (3) convert the training set, validation set, and pseudo-label set into the WebDataset format. Following, we provide an example using the KITTI dataset.
 
 #### Dataset Download and Reorganize
 Follow the steps below to install the dependencies needed for dataset download, reorganization and conversion to the WebDataset format.
@@ -183,9 +183,9 @@ output_dir=outputs
 ```
 
 ### Inference on Custom Data
-Next, we provide instruction to run MR-DINOSAUR on custom data. Given images at /path/to/custom, run the following steps.
+Next, we provide instructions to run MR-DINOSAUR on custom data. Given images at /path/to/custom, run the following steps.
 #### 1. Download the checkpoints and config files.
-Download the trained checkpoints and corresponding config files from [here](https://drive.google.com/drive/folders/1-kxTO6cqkavNgDeyc_b4NWt4RWbvrTZ9?usp=drive_link), e.g. kitti_mr_stage2.ckpt and kitti_config_mr_stage2.yaml.
+Download the trained checkpoints and corresponding config files from [here](https://drive.google.com/drive/folders/1-kxTO6cqkavNgDeyc_b4NWt4RWbvrTZ9?usp=drive_link), e.g., kitti_mr_stage2.ckpt and kitti_config_mr_stage2.yaml.
 #### 2. Convert custom images to WebDataset format.
 
 ```bash

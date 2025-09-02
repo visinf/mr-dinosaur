@@ -24,7 +24,7 @@ hessian.AI *equal contribution
 
 </div>
 
-**TL;DR:** We present MR-DINOSAUR, a fully unsupervised framework for multi-object discovery (MOD). Our method constructs pseudo labels by extracting video frames without camera motion and applying motion segmentation. Using our pseudo labels we extend the object-centric learning model DINOSAUR to unsupervised MOD. MR-DINOSAUR achieves strong performance on TRI-PD and KITTI, surpassing prior state-of-the-art methods despite being fully unsupervised.
+**TL;DR:** We present MR-DINOSAUR, a fully unsupervised framework for multi-object discovery (MOD). Our method constructs pseudo labels by extracting video frames without camera motion and applying motion segmentation. Using our pseudo labels, we extend the object-centric learning model DINOSAUR to unsupervised MOD. MR-DINOSAUR achieves strong performance on TRI-PD and KITTI, surpassing prior state-of-the-art methods despite being fully unsupervised.
 
 
 ## Abstract
@@ -209,7 +209,7 @@ output_dir=outputs
 [Here](https://drive.google.com/drive/folders/1-kxTO6cqkavNgDeyc_b4NWt4RWbvrTZ9?usp=drive_link) we provide checkpoints of the trained models.
 
 ## Citation
-If you find our work usefull, please consider citing the following paper.
+If you find our work useful, please consider citing the following paper.
 
 ```bibtex
 @inproceedings{Gong:2025:MRD,
@@ -220,8 +220,8 @@ If you find our work usefull, please consider citing the following paper.
             Simone Schaub-Meyer and 
             Daniel Cremers and 
             Stefan Roth},
-  title = {Motion-Refined DINOSAUR for Unsupervised Multi-Object Discovery},
-  booktitle={Proceedings of the IEEE International Conference on Computer Vision Workshops (ICCVW)},
+  title = {Motion-Refined {DINOSAUR} for Unsupervised Multi-Object Discovery},
+  booktitle = {Proceedings of the IEEE International Conference on Computer Vision Workshops (ICCVW)},
   year  = {2025},
 }
 ```

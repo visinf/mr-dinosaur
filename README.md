@@ -11,7 +11,7 @@ hessian.AI *equal contribution
 
 [<h3>ICCVW 2025</h3>](https://ilr-workshop.github.io/ICCVW2025)
 
-<a href="https://arxiv.org"><img src='https://img.shields.io/badge/ArXiv-grey' alt='Paper PDF'></a> 
+<a href="https://arxiv.org/abs/2509.02545"><img src='https://img.shields.io/badge/ArXiv-grey' alt='Paper PDF'></a> 
 
 <a href="https://opensource.org/licenses/Apache-2.0"><img src='https://img.shields.io/badge/License-Apache%202.0-blue.svg' alt='License'></a>
 [![Framework](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?&logo=PyTorch&logoColor=white)](https://pytorch.org/)
